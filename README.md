@@ -1,3 +1,5 @@
+![alt tag](https://github.com/jchristn/urlmatcher/blob/main/assets/icon.ico)
+
 # UrlMatcher
 
 [![NuGet Version](https://img.shields.io/nuget/v/UrlMatcher.svg?style=flat)](https://www.nuget.org/packages/UrlMatcher/) [![NuGet](https://img.shields.io/nuget/dt/UrlMatcher.svg)](https://www.nuget.org/packages/UrlMatcher) 
