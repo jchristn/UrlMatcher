@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Test/1.0.0": {
+        "dependencies": {
+          "UrlMatcher": "1.0.0"
+        },
+        "runtime": {
+          "Test.dll": {}
+        }
+      },
+      "UrlMatcher/1.0.0": {
+        "runtime": {
+          "UrlMatcher.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Test/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UrlMatcher/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

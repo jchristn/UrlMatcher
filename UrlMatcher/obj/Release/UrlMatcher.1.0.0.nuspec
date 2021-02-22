@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>UrlMatcher</id>
+    <version>1.0.0</version>
+    <authors>Joel Christner</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.md</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>icon.png</icon>
+    <projectUrl>https://github.com/jchristn/UrlMatcher</projectUrl>
+    <description>Simple URL matcher library allowing you to match based on explicit string or parameters</description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>(c)2021 Joel Christner</copyright>
+    <tags>url match matcher parameter</tags>
+    <repository type="github" url="https://github.com/jchristn/UrlMatcher" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.2" />
+      <group targetFramework=".NETCoreApp3.1" />
+      <group targetFramework="net5.0" />
+      <group targetFramework=".NETStandard2.0" />
+      <group targetFramework=".NETStandard2.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net452\UrlMatcher.dll" target="lib\net452\UrlMatcher.dll" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net452\UrlMatcher.xml" target="lib\net452\UrlMatcher.xml" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\UrlMatcher.dll" target="lib\net5.0\UrlMatcher.dll" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\UrlMatcher.xml" target="lib\net5.0\UrlMatcher.xml" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netcoreapp3.1\UrlMatcher.dll" target="lib\netcoreapp3.1\UrlMatcher.dll" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netcoreapp3.1\UrlMatcher.xml" target="lib\netcoreapp3.1\UrlMatcher.xml" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netstandard2.0\UrlMatcher.dll" target="lib\netstandard2.0\UrlMatcher.dll" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netstandard2.0\UrlMatcher.xml" target="lib\netstandard2.0\UrlMatcher.xml" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netstandard2.1\UrlMatcher.dll" target="lib\netstandard2.1\UrlMatcher.dll" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netstandard2.1\UrlMatcher.xml" target="lib\netstandard2.1\UrlMatcher.xml" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\assets\icon.png" target="icon.png" />
+    <file src="C:\Code\Misc\UrlMatcher\UrlMatcher\LICENSE.md" target="LICENSE.md" />
+  </files>
+</package>
