@@ -2,7 +2,6 @@ C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\netcoreapp3.1\UrlMatcher.deps.json
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\netcoreapp3.1\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\netcoreapp3.1\UrlMatcher.pdb
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\netcoreapp3.1\UrlMatcher.xml
-C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\netcoreapp3.1\UrlMatcher.csprojAssemblyReference.cache
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\netcoreapp3.1\UrlMatcher.AssemblyInfoInputs.cache
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\netcoreapp3.1\UrlMatcher.AssemblyInfo.cs
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\netcoreapp3.1\UrlMatcher.csproj.CoreCompileInputs.cache
@@ -10,3 +9,5 @@ C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\netcoreapp3.1\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\netcoreapp3.1\UrlMatcher.pdb
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\netcoreapp3.1\assets\icon.ico
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\netcoreapp3.1\assets\icon.png
+C:\code\Misc\UrlMatcher\UrlMatcher\obj\Debug\netcoreapp3.1\UrlMatcher.csproj.AssemblyReference.cache
+C:\code\Misc\UrlMatcher\UrlMatcher\obj\Debug\netcoreapp3.1\UrlMatcher.GeneratedMSBuildEditorConfig.editorconfig

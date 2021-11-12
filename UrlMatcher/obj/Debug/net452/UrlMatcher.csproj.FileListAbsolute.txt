@@ -1,7 +1,6 @@
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\net452\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\net452\UrlMatcher.pdb
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\net452\UrlMatcher.xml
-C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\net452\UrlMatcher.csprojAssemblyReference.cache
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\net452\UrlMatcher.AssemblyInfoInputs.cache
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\net452\UrlMatcher.AssemblyInfo.cs
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\net452\UrlMatcher.csproj.CoreCompileInputs.cache
@@ -9,3 +8,5 @@ C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\net452\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Debug\net452\UrlMatcher.pdb
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\net452\assets\icon.ico
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Debug\net452\assets\icon.png
+C:\code\Misc\UrlMatcher\UrlMatcher\obj\Debug\net452\UrlMatcher.csproj.AssemblyReference.cache
+C:\code\Misc\UrlMatcher\UrlMatcher\obj\Debug\net452\UrlMatcher.GeneratedMSBuildEditorConfig.editorconfig

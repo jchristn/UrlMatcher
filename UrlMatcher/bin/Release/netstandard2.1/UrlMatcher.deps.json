@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v2.1": {},
     ".NETStandard,Version=v2.1/": {
-      "UrlMatcher/1.0.0.1": {
+      "UrlMatcher/1.0.0.2": {
         "runtime": {
           "UrlMatcher.dll": {}
         }
@@ -15,7 +15,7 @@
     }
   },
   "libraries": {
-    "UrlMatcher/1.0.0.1": {
+    "UrlMatcher/1.0.0.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

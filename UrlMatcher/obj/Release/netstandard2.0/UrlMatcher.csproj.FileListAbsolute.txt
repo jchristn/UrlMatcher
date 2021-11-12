@@ -4,9 +4,10 @@ C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netstandard2.0\UrlMatcher.deps.js
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netstandard2.0\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netstandard2.0\UrlMatcher.pdb
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\netstandard2.0\UrlMatcher.xml
-C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.0\UrlMatcher.csprojAssemblyReference.cache
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.0\UrlMatcher.AssemblyInfoInputs.cache
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.0\UrlMatcher.AssemblyInfo.cs
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.0\UrlMatcher.csproj.CoreCompileInputs.cache
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.0\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.0\UrlMatcher.pdb
+C:\code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.0\UrlMatcher.csproj.AssemblyReference.cache
+C:\code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.0\UrlMatcher.GeneratedMSBuildEditorConfig.editorconfig

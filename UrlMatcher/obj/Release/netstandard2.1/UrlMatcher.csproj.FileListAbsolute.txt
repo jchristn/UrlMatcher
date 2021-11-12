@@ -9,4 +9,5 @@ C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.1\UrlMatcher.Assembl
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.1\UrlMatcher.csproj.CoreCompileInputs.cache
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.1\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.1\UrlMatcher.pdb
-C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.1\UrlMatcher.csprojAssemblyReference.cache
+C:\code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.1\UrlMatcher.csproj.AssemblyReference.cache
+C:\code\Misc\UrlMatcher\UrlMatcher\obj\Release\netstandard2.1\UrlMatcher.GeneratedMSBuildEditorConfig.editorconfig
