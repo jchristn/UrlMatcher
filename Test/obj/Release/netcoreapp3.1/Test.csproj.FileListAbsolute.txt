@@ -1,6 +1,7 @@
 C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\Test.exe
 C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\assets\icon.ico
 C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\assets\icon.png
+C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\UrlMatcher.xml
 C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\Test.deps.json
 C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\Test.runtimeconfig.json
 C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\Test.runtimeconfig.dev.json
@@ -8,7 +9,8 @@ C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\Test.dll
 C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\Test.pdb
 C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\UrlMatcher.pdb
-C:\Code\Misc\UrlMatcher\Test\bin\Release\netcoreapp3.1\UrlMatcher.xml
+C:\Code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.csproj.AssemblyReference.cache
+C:\Code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.GeneratedMSBuildEditorConfig.editorconfig
 C:\Code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.AssemblyInfoInputs.cache
 C:\Code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.AssemblyInfo.cs
 C:\Code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.csproj.CoreCompileInputs.cache
@@ -16,5 +18,3 @@ C:\Code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.csproj.CopyComplete
 C:\Code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.dll
 C:\Code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.pdb
 C:\Code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.genruntimeconfig.cache
-C:\code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.csproj.AssemblyReference.cache
-C:\code\Misc\UrlMatcher\Test\obj\Release\netcoreapp3.1\Test.GeneratedMSBuildEditorConfig.editorconfig

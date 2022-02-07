@@ -1,10 +1,10 @@
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\assets\icon.ico
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\assets\icon.png
+C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\UrlMatcher.xml
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\UrlMatcher.deps.json
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\ref\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\UrlMatcher.pdb
-C:\Code\Misc\UrlMatcher\UrlMatcher\bin\Release\net5.0\UrlMatcher.xml
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\net5.0\UrlMatcher.GeneratedMSBuildEditorConfig.editorconfig
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\net5.0\UrlMatcher.AssemblyInfoInputs.cache
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\net5.0\UrlMatcher.AssemblyInfo.cs
@@ -12,4 +12,4 @@ C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\net5.0\UrlMatcher.csproj.CoreComp
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\net5.0\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\net5.0\ref\UrlMatcher.dll
 C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\net5.0\UrlMatcher.pdb
-C:\code\Misc\UrlMatcher\UrlMatcher\obj\Release\net5.0\UrlMatcher.csproj.AssemblyReference.cache
+C:\Code\Misc\UrlMatcher\UrlMatcher\obj\Release\net5.0\UrlMatcher.csproj.AssemblyReference.cache

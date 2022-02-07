@@ -5,7 +5,7 @@
   },
   "projects": {
     "C:\\Code\\Misc\\UrlMatcher\\UrlMatcher\\UrlMatcher.csproj": {
-      "version": "1.0.0.2",
+      "version": "1.0.0.3",
       "restore": {
         "projectUniqueName": "C:\\Code\\Misc\\UrlMatcher\\UrlMatcher\\UrlMatcher.csproj",
         "projectName": "UrlMatcher",
@@ -15,18 +15,15 @@
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
           "C:\\Users\\joelc\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net452",
+          "net462",
           "net5.0",
           "net6.0",
           "netcoreapp3.1",
@@ -34,8 +31,8 @@
           "netstandard2.1"
         ],
         "sources": {
-          "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.pkg.github.com/jchristn/index.json": {}
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "netcoreapp3.1": {
@@ -50,8 +47,8 @@
             "targetAlias": "net6.0",
             "projectReferences": {}
           },
-          "net452": {
-            "targetAlias": "net452",
+          "net462": {
+            "targetAlias": "net462",
             "projectReferences": {}
           },
           "netstandard2.0": {
@@ -127,8 +124,8 @@
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
         },
-        "net452": {
-          "targetAlias": "net452",
+        "net462": {
+          "targetAlias": "net462",
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
         },
         "netstandard2.0": {
