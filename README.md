@@ -10,27 +10,49 @@ Simple URL matcher library allowing you to match based on explicit string or par
 
 First things first - do you need help or have feedback?  File an issue here!  We'd love to hear from you.
 
-## New in v1.0.0
+## New in v3.0.0
 
-- Initial release
+- Refactor to support both static methods and instances
+- Instances take either a `Uri` or `string` (URL)
 
 ## It's Really Easy...  I Mean, REALLY Easy
 
 Refer to the ```Test``` project for a working example.
 
+### Simple Static Method
+
+Use the static method when you need to compare an input URL against a pattern once.
+
 ```csharp
 using UrlMatcher;
 
-Matcher matcher = new Matcher();
-string pattern = "/{version}/foo/{whatever}/bar";
-Dictionary<string, string> vals = null;
+string pattern = "/{version}/users/{userId}";
+NameValueCollection vals = null;
 
-if (parser.Match("/v1.0/foo/woohoo/bar", pattern, out vals))
+if (Matcher.Match("/v1.0/users/42", pattern, out vals))
 {
   Console.WriteLine("Match!");
-  Console.WriteLine("  version  : " + vals["version"]);  // v1.0
-  Console.WriteLine("  whatever : " + vals["whatever"]); // woohoo
+  Console.WriteLine("  version : " + vals["version"]);  // v1.0
+  Console.WriteLine("  userId  : " + vals["userId"]);   // 42
 }
+else
+{
+  Console.WriteLine("No match");
+}
+```
+
+### Instance Method
+
+Instantiate the class by supplying the URI or URL.  Using the instance method eliminates the need to repeatedly parse the input URI or URL.
+
+```csharp
+using UrlMatcher;
+
+Matcher matcher = new Matcher("/v1.0/users/42");
+NameValueCollection vals = null;
+
+if (matcher.Match("/{version}/users/{userId}"))          // do something
+else if (matcher.Match("/{version}/hobbies/{hobbyId}"))  // do something
 else
 {
   Console.WriteLine("No match");

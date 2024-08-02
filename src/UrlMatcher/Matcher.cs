@@ -1,29 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-
-namespace UrlMatcher
+﻿namespace UrlMatcher
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+
     /// <summary>
     /// URL matcher.
     /// </summary>
     public class Matcher
     {
-        // To do
-        // Support values before or after the pattern
-
         #region Public-Members
 
         /// <summary>
-        /// Method to invoke to send log messages.
+        /// URL.
         /// </summary>
-        public Action<string> Logger = null;
+        public string Url
+        {
+            get
+            {
+                return _Url;
+            }
+        }
+
+        /// <summary>
+        /// URL parts.
+        /// </summary>
+        public string[] Parts
+        {
+            get
+            {
+                return _Parts;
+            }
+        }
 
         #endregion
 
         #region Private-Members
 
-        private string _Header = "[UrlParser] ";
+        private string _Url = null;
+        private string[] _Parts = null;
 
         #endregion
 
@@ -32,14 +47,71 @@ namespace UrlMatcher
         /// <summary>
         /// Instantiate the object.
         /// </summary>
-        public Matcher()
+        /// <param name="url">URL.</param>
+        public Matcher(string url)
         {
+            if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
 
+            url = url.Split('?', '#')[0];
+
+            _Url = url;
+            _Parts = url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        /// <summary>
+        /// Instantiate the object.
+        /// </summary>
+        /// <param name="uri">URI.</param>
+        public Matcher(Uri uri)
+        {
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
+
+            string url = uri.PathAndQuery.Split('?', '#')[0];
+
+            _Url = url;
+            _Parts = url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         #endregion
 
         #region Public-Methods
+
+        /// <summary>
+        /// Match the URL or URI supplied in the constructor against a pattern.
+        /// For example, match URI http://localhost:8000/v1.0/something/else/32 against pattern /{v}/something/else/{id}.
+        /// Or, match URL /v1.0/something/else/32 against pattern /{v}/something/else/{id}.
+        /// If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
+        /// </summary>
+        /// <param name="pattern">The pattern used to evaluate the URI.</param>
+        /// <param name="vals">Name value collection containing keys and values.</param>
+        /// <returns>True if matched.</returns>
+        public bool Match(string pattern, out NameValueCollection vals)
+        {
+            vals = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+            if (String.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
+
+            string[] patternParts = pattern.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+
+            return MatchInternal(_Parts, patternParts, out vals);
+        }
+
+        /// <summary>
+        /// Match a URI against a pattern.
+        /// For example, match URI http://localhost:8000/v1.0/something/else/32 against pattern /{v}/something/else/{id}.
+        /// If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
+        /// </summary>
+        /// <param name="uri">The URI to evaluate.</param>
+        /// <param name="pattern">The pattern used to evaluate the URI.</param>
+        /// <param name="vals">Name value collection containing keys and values.</param>
+        /// <returns>True if matched.</returns>
+        public static bool Match(Uri uri, string pattern, out NameValueCollection vals)
+        {
+            vals = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
+            if (String.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
+
+            return Match(uri.PathAndQuery, pattern, out vals);
+        }
 
         /// <summary>
         /// Match a URL against a pattern.
@@ -48,52 +120,57 @@ namespace UrlMatcher
         /// </summary>
         /// <param name="url">The URL to evaluate.</param>
         /// <param name="pattern">The pattern used to evaluate the URL.</param>
-        /// <param name="vals">Dictionary containing keys and values.</param>
+        /// <param name="vals">Name value collection containing keys and values.</param>
         /// <returns>True if matched.</returns>
-        public bool Match(string url, string pattern, out NameValueCollection vals)
+        public static bool Match(string url, string pattern, out NameValueCollection vals)
         {
-            vals = null;
+            vals = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
             if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
             if (String.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
 
-            vals = new NameValueCollection();
+            url = url.Split('?', '#')[0];
+
             string[] urlParts = url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             string[] patternParts = pattern.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (urlParts.Length != patternParts.Length) return false;
-
-            for (int i = 0; i < urlParts.Length; i++)
-            {
-                string paramName = ExtractParameter(patternParts[i]);
-                
-                if (String.IsNullOrEmpty(paramName))
-                {
-                    // no pattern
-                    if (!urlParts[i].Equals(patternParts[i]))
-                    {
-                        Logger?.Invoke(_Header + "content mismatch at position " + i);
-                        vals = null;
-                        return false;
-                    }
-                }
-                else
-                { 
-                    Logger?.Invoke(_Header + paramName.Replace("{", "").Replace("}", "") + ": " + urlParts[i]); 
-                    vals.Add(
-                        paramName.Replace("{", "").Replace("}", ""),
-                        urlParts[i]);
-                }
-            }
-
-            Logger?.Invoke(_Header + "match detected, " + vals.Count + " parameters extracted");
-            return true;
+            return MatchInternal(urlParts, patternParts, out vals);
         }
 
         #endregion
 
         #region Private-Methods
 
-        private string ExtractParameter(string pattern)
+        private static bool MatchInternal(string[] urlParts, string[] patternParts, out NameValueCollection vals)
+        {
+            vals = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+
+            if (urlParts.Length != patternParts.Length) return false;
+
+            for (int i = 0; i < urlParts.Length; i++)
+            {
+                string paramName = ExtractParameter(patternParts[i]);
+
+                if (String.IsNullOrEmpty(paramName))
+                {
+                    // no pattern
+                    if (!urlParts[i].Equals(patternParts[i]))
+                    {
+                        vals = null;
+                        return false;
+                    }
+                }
+                else
+                {
+                    vals.Add(
+                        paramName.Replace("{", "").Replace("}", ""),
+                        urlParts[i]);
+                }
+            }
+
+            return true;
+        }
+
+        private static string ExtractParameter(string pattern)
         {
             if (String.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
 
@@ -111,22 +188,6 @@ namespace UrlMatcher
             }
 
             return null;
-        }
-
-        private string ExtractParameterValue(string url, string pattern)
-        {
-            if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
-            if (String.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
-             
-            int indexStart = pattern.IndexOf('{');
-            int indexEnd = pattern.LastIndexOf('}');
-
-            if ((indexEnd - 1)> indexStart)
-            {
-                return url.Substring(indexStart, (indexEnd - 1));
-            }
-
-            return "";
         }
 
         #endregion

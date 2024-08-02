@@ -9,15 +9,49 @@
             URL matcher.
             </summary>
         </member>
-        <member name="F:UrlMatcher.Matcher.Logger">
+        <member name="P:UrlMatcher.Matcher.Url">
             <summary>
-            Method to invoke to send log messages.
+            URL.
             </summary>
         </member>
-        <member name="M:UrlMatcher.Matcher.#ctor">
+        <member name="P:UrlMatcher.Matcher.Parts">
+            <summary>
+            URL parts.
+            </summary>
+        </member>
+        <member name="M:UrlMatcher.Matcher.#ctor(System.String)">
             <summary>
             Instantiate the object.
             </summary>
+            <param name="url">URL.</param>
+        </member>
+        <member name="M:UrlMatcher.Matcher.#ctor(System.Uri)">
+            <summary>
+            Instantiate the object.
+            </summary>
+            <param name="uri">URI.</param>
+        </member>
+        <member name="M:UrlMatcher.Matcher.Match(System.String,System.Collections.Specialized.NameValueCollection@)">
+            <summary>
+            Match the URL or URI supplied in the constructor against a pattern.
+            For example, match URI http://localhost:8000/v1.0/something/else/32 against pattern /{v}/something/else/{id}.
+            Or, match URL /v1.0/something/else/32 against pattern /{v}/something/else/{id}.
+            If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
+            </summary>
+            <param name="pattern">The pattern used to evaluate the URI.</param>
+            <param name="vals">Name value collection containing keys and values.</param>
+            <returns>True if matched.</returns>
+        </member>
+        <member name="M:UrlMatcher.Matcher.Match(System.Uri,System.String,System.Collections.Specialized.NameValueCollection@)">
+            <summary>
+            Match a URI against a pattern.
+            For example, match URI http://localhost:8000/v1.0/something/else/32 against pattern /{v}/something/else/{id}.
+            If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
+            </summary>
+            <param name="uri">The URI to evaluate.</param>
+            <param name="pattern">The pattern used to evaluate the URI.</param>
+            <param name="vals">Name value collection containing keys and values.</param>
+            <returns>True if matched.</returns>
         </member>
         <member name="M:UrlMatcher.Matcher.Match(System.String,System.String,System.Collections.Specialized.NameValueCollection@)">
             <summary>
@@ -27,7 +61,7 @@
             </summary>
             <param name="url">The URL to evaluate.</param>
             <param name="pattern">The pattern used to evaluate the URL.</param>
-            <param name="vals">Dictionary containing keys and values.</param>
+            <param name="vals">Name value collection containing keys and values.</param>
             <returns>True if matched.</returns>
         </member>
     </members>

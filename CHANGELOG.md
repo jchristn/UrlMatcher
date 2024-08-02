@@ -2,10 +2,17 @@
 
 ## Current Version
 
-v1.0.0
+v3.0.x
 
-- Initial release
+- Refactor to support both static methods and instances
+- Instances take either a `Uri` or `string` (URL)
 
 ## Previous Versions
 
-Notes from previous versions will be placed here.
+v2.0.x
+
+- Migrate to `NameValueCollection` instead of `Dictionary`
+
+v1.0.x
+
+- Initial release
