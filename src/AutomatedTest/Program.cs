@@ -74,6 +74,16 @@ namespace AutomatedTest
             await RunTest("Fragment Without Path", Test_FragmentWithoutPath);
             await RunTest("Unicode Characters in Literal", Test_UnicodeCharactersInLiteral);
             await RunTest("Unicode Characters in Parameter Value", Test_UnicodeCharactersInParameterValue);
+            await RunTest("Literal Mismatch - Middle Part", Test_LiteralMismatch_MiddlePart);
+            await RunTest("Parameter Value Case Preserved", Test_ParameterValueCasePreserved);
+            await RunTest("Empty Pattern Value Mismatch", Test_ParameterCannotMatchMissingPart);
+            await RunTest("URI With Query and Fragment", Test_UriWithQueryAndFragment);
+            await RunTest("Instance URI Parts Extraction", Test_InstanceUriPartsExtraction);
+            await RunTest("Consecutive Slashes Collapsed", Test_ConsecutiveSlashesCollapsed);
+            await RunTest("Numeric vs Literal No Match", Test_NumericVsLiteralNoMatch);
+            await RunTest("Longer Pattern Negative", Test_LongerPatternNegative);
+            await RunTest("Dot Segments As Literals", Test_DotSegmentsAsLiterals);
+            await RunTest("Mixed Literal and Param Negative", Test_MixedLiteralAndParamNegative);
 
             totalTimer.Stop();
 
@@ -1145,6 +1155,188 @@ namespace AutomatedTest
                 Matched = result,
                 Parameters = vals,
                 Description = "Unicode characters in parameter values"
+            };
+        }
+
+        static TestDetail Test_LiteralMismatch_MiddlePart()
+        {
+            string url = "/api/v1/users/42";
+            string pattern = "/api/v2/users/{id}";
+            NameValueCollection vals;
+            bool result = Matcher.Match(url, pattern, out vals);
+
+            return new TestDetail
+            {
+                Passed = !result && vals.Count == 0,
+                Url = url,
+                Pattern = pattern,
+                Matched = result,
+                Parameters = vals,
+                Description = "Should NOT match - literal 'v1' != 'v2' in the middle"
+            };
+        }
+
+        static TestDetail Test_ParameterValueCasePreserved()
+        {
+            string url = "/users/AbC123";
+            string pattern = "/users/{id}";
+            NameValueCollection vals;
+            bool result = Matcher.Match(url, pattern, out vals);
+            // Parameter names are case-insensitive, but the extracted VALUE must preserve case.
+
+            return new TestDetail
+            {
+                Passed = result && vals["id"] == "AbC123",
+                Url = url,
+                Pattern = pattern,
+                Matched = result,
+                Parameters = vals,
+                Description = "Extracted parameter value must preserve original casing"
+            };
+        }
+
+        static TestDetail Test_ParameterCannotMatchMissingPart()
+        {
+            // A trailing parameter has no corresponding URL part -> different part counts -> no match.
+            string url = "/users";
+            string pattern = "/users/{id}";
+            NameValueCollection vals;
+            bool result = Matcher.Match(url, pattern, out vals);
+
+            return new TestDetail
+            {
+                Passed = !result && vals.Count == 0,
+                Url = url,
+                Pattern = pattern,
+                Matched = result,
+                Parameters = vals,
+                Description = "A parameter with no corresponding URL part should not match"
+            };
+        }
+
+        static TestDetail Test_UriWithQueryAndFragment()
+        {
+            Uri uri = new Uri("http://localhost:8000/v1.0/users/42?active=true#top");
+            string pattern = "/{version}/users/{id}";
+            NameValueCollection vals;
+            bool result = Matcher.Match(uri, pattern, out vals);
+
+            return new TestDetail
+            {
+                Passed = result && vals["version"] == "v1.0" && vals["id"] == "42",
+                Url = uri.ToString(),
+                Pattern = pattern,
+                Matched = result,
+                Parameters = vals,
+                Description = "URI query and fragment should be stripped before matching"
+            };
+        }
+
+        static TestDetail Test_InstanceUriPartsExtraction()
+        {
+            Uri uri = new Uri("http://localhost:9000/a/b/c?x=1");
+            Matcher matcher = new Matcher(uri);
+            string[] parts = matcher.Parts;
+            bool passed = parts.Length == 3 && parts[0] == "a" && parts[1] == "b" && parts[2] == "c";
+
+            return new TestDetail
+            {
+                Passed = passed,
+                Url = uri.ToString(),
+                Description = "URI constructor should extract path parts without query string"
+            };
+        }
+
+        static TestDetail Test_ConsecutiveSlashesCollapsed()
+        {
+            string url = "/users//42";
+            string pattern = "/users/{id}";
+            NameValueCollection vals;
+            bool result = Matcher.Match(url, pattern, out vals);
+
+            return new TestDetail
+            {
+                Passed = result && vals["id"] == "42",
+                Url = url,
+                Pattern = pattern,
+                Matched = result,
+                Parameters = vals,
+                Description = "Consecutive slashes collapse so /users//42 matches /users/{id}"
+            };
+        }
+
+        static TestDetail Test_NumericVsLiteralNoMatch()
+        {
+            string url = "/orders/2024";
+            string pattern = "/orders/2023";
+            NameValueCollection vals;
+            bool result = Matcher.Match(url, pattern, out vals);
+
+            return new TestDetail
+            {
+                Passed = !result,
+                Url = url,
+                Pattern = pattern,
+                Matched = result,
+                Parameters = vals,
+                Description = "Should NOT match - numeric literal '2024' != '2023'"
+            };
+        }
+
+        static TestDetail Test_LongerPatternNegative()
+        {
+            string url = "/a/b";
+            string pattern = "/{one}/{two}/{three}";
+            NameValueCollection vals;
+            bool result = Matcher.Match(url, pattern, out vals);
+
+            return new TestDetail
+            {
+                Passed = !result && vals.Count == 0,
+                Url = url,
+                Pattern = pattern,
+                Matched = result,
+                Parameters = vals,
+                Description = "Should NOT match - pattern has 3 params but URL has 2 parts"
+            };
+        }
+
+        static TestDetail Test_DotSegmentsAsLiterals()
+        {
+            string url = "/files/./config";
+            string pattern = "/files/./config";
+            NameValueCollection vals;
+            bool result = Matcher.Match(url, pattern, out vals);
+
+            return new TestDetail
+            {
+                Passed = result && vals.Count == 0,
+                Url = url,
+                Pattern = pattern,
+                Matched = result,
+                Parameters = vals,
+                Description = "Dot segments are treated as ordinary literal parts"
+            };
+        }
+
+        static TestDetail Test_MixedLiteralAndParamNegative()
+        {
+            string url = "/v1.0/users/42";
+            string pattern = "/{version}/admins/{id}";
+            NameValueCollection vals;
+            bool result = Matcher.Match(url, pattern, out vals);
+            // The literal 'admins' does not match 'users', so overall no match. Note the library
+            // accumulates parameter values encountered before the failing literal (e.g. 'version'),
+            // so only the boolean result is a reliable indicator of a failed match.
+
+            return new TestDetail
+            {
+                Passed = !result,
+                Url = url,
+                Pattern = pattern,
+                Matched = result,
+                Parameters = vals,
+                Description = "Should NOT match - literal 'users' != 'admins' despite an earlier matching param"
             };
         }
 

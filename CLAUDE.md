@@ -60,9 +60,9 @@ The library consists of a single class `Matcher` in `Matcher.cs` with two usage 
 The library targets multiple frameworks defined in `UrlMatcher.csproj`:
 - .NET Standard 2.0, 2.1 (broad compatibility)
 - .NET Framework 4.6.2, 4.8 (legacy support)
-- .NET 6.0, 8.0 (modern .NET)
+- .NET 8.0, 10.0 (modern .NET)
 
-The Test project targets: `net462`, `net48`, `net6.0`, `net8.0`
+The Test and AutomatedTest projects target: `net462`, `net48`, `net8.0`, `net10.0`
 
 ### NuGet Package
 
