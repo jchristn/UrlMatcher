@@ -1,4 +1,4 @@
-﻿namespace UrlMatcher
+namespace UrlMatcher
 {
     using System;
     using System.Collections.Generic;
@@ -6,13 +6,23 @@
 
     /// <summary>
     /// URL matcher.
+    /// Use the static methods to match a URL against a pattern once, or create an instance to parse a URL once and
+    /// match it against many patterns.  Instances are immutable after construction and are safe to use from
+    /// multiple threads concurrently.
     /// </summary>
+    /// <remarks>
+    /// URLs and patterns are split on '/' and empty segments are discarded, so leading, trailing, and repeated
+    /// slashes do not affect matching.  The query string and fragment are removed from the URL (not the pattern)
+    /// before matching.  Literal segments are compared ordinally (case-sensitive).  Parameter names are
+    /// case-insensitive.  Values are returned exactly as they appear in the URL and are not URL-decoded.
+    /// See <see cref="UrlPattern"/> for the full pattern syntax, including catch-all segments written {*name}.
+    /// </remarks>
     public class Matcher
     {
         #region Public-Members
 
         /// <summary>
-        /// URL.
+        /// URL, with the query string and fragment removed.
         /// </summary>
         public string Url => _Url;
 
@@ -28,6 +38,7 @@
 
         private string _Url = null;
         private string[] _Parts = null;
+        private int[] _Offsets = null;
 
         #endregion
 
@@ -37,28 +48,26 @@
         /// Instantiate the object.
         /// </summary>
         /// <param name="url">URL.</param>
+        /// <exception cref="ArgumentNullException">Thrown when url is null or empty.</exception>
         public Matcher(string url)
         {
             if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
 
-            url = StripQueryAndFragment(url);
-
-            _Url = url;
-            _Parts = url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            _Url = StripQueryAndFragment(url);
+            _Parts = SplitUrl(_Url, out _Offsets);
         }
 
         /// <summary>
         /// Instantiate the object.
         /// </summary>
-        /// <param name="uri">URI.</param>
+        /// <param name="uri">URI.  Only the path is used.</param>
+        /// <exception cref="ArgumentNullException">Thrown when uri is null.</exception>
         public Matcher(Uri uri)
         {
             if (uri == null) throw new ArgumentNullException(nameof(uri));
 
-            string url = StripQueryAndFragment(uri.PathAndQuery);
-
-            _Url = url;
-            _Parts = url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            _Url = StripQueryAndFragment(uri.PathAndQuery);
+            _Parts = SplitUrl(_Url, out _Offsets);
         }
 
         #endregion
@@ -70,16 +79,32 @@
         /// For example, match URI http://localhost:8000/v1.0/something/else/32 against pattern /{v}/something/else/{id}.
         /// Or, match URL /v1.0/something/else/32 against pattern /{v}/something/else/{id}.
         /// If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
+        /// A pattern ending in a catch-all, such as /api/{*rest}, matches zero or more remaining segments and captures the raw remainder.
         /// </summary>
-        /// <param name="pattern">The pattern used to evaluate the URI. Parameters are specified using {name} syntax.</param>
-        /// <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Will be empty if no match. URL-encoded values are matched as-is (not decoded).</param>
+        /// <param name="pattern">The pattern used to evaluate the URI. Parameters are specified using {name} syntax, and a final catch-all using {*name} syntax.</param>
+        /// <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match. URL-encoded values are matched as-is (not decoded).</param>
         /// <returns>True if matched. Note: Literal parts are case-sensitive while parameter names are case-insensitive.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when pattern is null or empty.</exception>
+        /// <exception cref="ArgumentException">Thrown when the pattern has an invalid catch-all (not the entire segment, not the last segment, or more than one).</exception>
         public bool Match(string pattern, out NameValueCollection vals)
         {
-            vals = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+            vals = NewCollection();
             if (String.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
-            string[] patternParts = pattern.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            return MatchInternal(_Parts, patternParts, out vals);
+            return MatchInternal(_Url, _Parts, _Offsets, new UrlPattern(pattern), out vals);
+        }
+
+        /// <summary>
+        /// Match the URL or URI supplied in the constructor against a pre-parsed pattern.
+        /// </summary>
+        /// <param name="pattern">The parsed pattern.</param>
+        /// <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match. URL-encoded values are matched as-is (not decoded).</param>
+        /// <returns>True if matched.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when pattern is null.</exception>
+        public bool Match(UrlPattern pattern, out NameValueCollection vals)
+        {
+            vals = NewCollection();
+            if (pattern == null) throw new ArgumentNullException(nameof(pattern));
+            return MatchInternal(_Url, _Parts, _Offsets, pattern, out vals);
         }
 
         /// <summary>
@@ -87,15 +112,33 @@
         /// For example, match URI http://localhost:8000/v1.0/something/else/32 against pattern /{v}/something/else/{id}.
         /// If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
         /// </summary>
-        /// <param name="uri">The URI to evaluate.</param>
-        /// <param name="pattern">The pattern used to evaluate the URI. Parameters are specified using {name} syntax.</param>
-        /// <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Will be empty if no match.</param>
+        /// <param name="uri">The URI to evaluate.  Only the path is used.</param>
+        /// <param name="pattern">The pattern used to evaluate the URI. Parameters are specified using {name} syntax, and a final catch-all using {*name} syntax.</param>
+        /// <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match.</param>
         /// <returns>True if matched. Note: Literal parts are case-sensitive while parameter names are case-insensitive.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when uri is null, or pattern is null or empty.</exception>
+        /// <exception cref="ArgumentException">Thrown when the pattern has an invalid catch-all (not the entire segment, not the last segment, or more than one).</exception>
         public static bool Match(Uri uri, string pattern, out NameValueCollection vals)
         {
-            vals = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+            vals = NewCollection();
             if (uri == null) throw new ArgumentNullException(nameof(uri));
             if (String.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
+            return Match(uri.PathAndQuery, new UrlPattern(pattern), out vals);
+        }
+
+        /// <summary>
+        /// Match a URI against a pre-parsed pattern.
+        /// </summary>
+        /// <param name="uri">The URI to evaluate.  Only the path is used.</param>
+        /// <param name="pattern">The parsed pattern.</param>
+        /// <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match.</param>
+        /// <returns>True if matched.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when uri or pattern is null.</exception>
+        public static bool Match(Uri uri, UrlPattern pattern, out NameValueCollection vals)
+        {
+            vals = NewCollection();
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
+            if (pattern == null) throw new ArgumentNullException(nameof(pattern));
             return Match(uri.PathAndQuery, pattern, out vals);
         }
 
@@ -103,68 +146,117 @@
         /// Match a URL against a pattern.
         /// For example, match URL /v1.0/something/else/32 against pattern /{v}/something/else/{id}.
         /// If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
+        /// A pattern ending in a catch-all, such as /api/{*rest}, matches zero or more remaining segments and captures the raw remainder.
         /// </summary>
         /// <param name="url">The URL to evaluate.</param>
-        /// <param name="pattern">The pattern used to evaluate the URL. Parameters are specified using {name} syntax.</param>
-        /// <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Will be empty if no match.</param>
+        /// <param name="pattern">The pattern used to evaluate the URL. Parameters are specified using {name} syntax, and a final catch-all using {*name} syntax.</param>
+        /// <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match.</param>
         /// <returns>True if matched. Note: Literal parts are case-sensitive while parameter names are case-insensitive.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when url or pattern is null or empty.</exception>
+        /// <exception cref="ArgumentException">Thrown when the pattern has an invalid catch-all (not the entire segment, not the last segment, or more than one).</exception>
         public static bool Match(string url, string pattern, out NameValueCollection vals)
         {
-            vals = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+            vals = NewCollection();
             if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
             if (String.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
+            return Match(url, new UrlPattern(pattern), out vals);
+        }
+
+        /// <summary>
+        /// Match a URL against a pre-parsed pattern.
+        /// </summary>
+        /// <param name="url">The URL to evaluate.</param>
+        /// <param name="pattern">The parsed pattern.</param>
+        /// <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match.</param>
+        /// <returns>True if matched.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when url is null or empty, or pattern is null.</exception>
+        public static bool Match(string url, UrlPattern pattern, out NameValueCollection vals)
+        {
+            vals = NewCollection();
+            if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
+            if (pattern == null) throw new ArgumentNullException(nameof(pattern));
 
             url = StripQueryAndFragment(url);
-
-            string[] urlParts = url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            string[] patternParts = pattern.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-
-            return MatchInternal(urlParts, patternParts, out vals);
+            string[] urlParts = SplitUrl(url, out int[] urlOffsets);
+            return MatchInternal(url, urlParts, urlOffsets, pattern, out vals);
         }
 
         #endregion
 
         #region Private-Methods
 
-        private static bool MatchInternal(string[] urlParts, string[] patternParts, out NameValueCollection vals)
+        private static NameValueCollection NewCollection()
         {
-            vals = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+            return new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+        }
 
-            if (urlParts.Length != patternParts.Length) return false;
+        private static bool MatchInternal(string url, string[] urlParts, int[] urlOffsets, UrlPattern pattern, out NameValueCollection vals)
+        {
+            vals = NewCollection();
 
-            for (int i = 0; i < urlParts.Length; i++)
+            int fixedCount = pattern.FixedSegmentCount;
+
+            if (pattern.IsCatchAll)
             {
-                string paramName = ExtractParameter(patternParts[i]);
+                if (urlParts.Length < fixedCount) return false;
+            }
+            else
+            {
+                if (urlParts.Length != fixedCount) return false;
+            }
 
-                if (String.IsNullOrEmpty(paramName))
+            IReadOnlyList<UrlPatternSegment> segments = pattern.Segments;
+            NameValueCollection captured = NewCollection();
+
+            for (int i = 0; i < fixedCount; i++)
+            {
+                UrlPatternSegment segment = segments[i];
+
+                if (segment.Type == SegmentTypeEnum.Literal)
                 {
-                    // no pattern - literal match (case-sensitive)
-                    if (!urlParts[i].Equals(patternParts[i], StringComparison.Ordinal))
-                    {
-                        return false;
-                    }
+                    // literal match (case-sensitive)
+                    if (!urlParts[i].Equals(segment.Text, StringComparison.Ordinal)) return false;
                 }
                 else
                 {
-                    vals.Add(paramName, urlParts[i]);
+                    captured.Add(segment.Name, urlParts[i]);
                 }
             }
 
+            if (pattern.IsCatchAll)
+            {
+                // raw remainder of the URL starting at the first unmatched segment, so repeated and trailing slashes are preserved
+                string remainder = urlParts.Length > fixedCount ? url.Substring(urlOffsets[fixedCount]) : "";
+                captured.Add(pattern.CatchAllName, remainder);
+            }
+
+            vals = captured;
             return true;
         }
 
-        private static string ExtractParameter(string pattern)
+        private static string[] SplitUrl(string url, out int[] offsets)
         {
-            if (String.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
+            List<string> parts = new List<string>();
+            List<int> starts = new List<int>();
 
-            int indexStart = pattern.IndexOf('{');
-            if (indexStart == -1) return null;
+            int i = 0;
+            while (i < url.Length)
+            {
+                if (url[i] == '/')
+                {
+                    i++;
+                    continue;
+                }
 
-            int indexEnd = pattern.IndexOf('}', indexStart);
-            if (indexEnd == -1 || indexEnd <= indexStart + 1) return null;
+                int start = i;
+                while (i < url.Length && url[i] != '/') i++;
 
-            // Return content without braces
-            return pattern.Substring(indexStart + 1, indexEnd - indexStart - 1);
+                parts.Add(url.Substring(start, i - start));
+                starts.Add(start);
+            }
+
+            offsets = starts.ToArray();
+            return parts.ToArray();
         }
 
         private static string StripQueryAndFragment(string url)

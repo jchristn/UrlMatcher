@@ -1,0 +1,48 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore src/UrlMatcher.sln
+
+      - name: Build
+        run: dotnet build src/UrlMatcher.sln --no-restore
+
+      - name: Build library in Release for every target framework
+        run: dotnet build src/UrlMatcher/UrlMatcher.csproj -c Release --no-restore
+
+      - name: Run console tests (net8.0)
+        run: dotnet run --no-build --project src/Test.Automated -f net8.0 -- --results results-net8.0.json
+
+      - name: Run console tests (net10.0)
+        run: dotnet run --no-build --project src/Test.Automated -f net10.0 -- --results results-net10.0.json
+
+      - name: Run xUnit tests
+        run: dotnet test src/Test.Xunit --no-build
+
+      - name: Run NUnit tests
+        run: dotnet test src/Test.Nunit --no-build
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: results-*.json

@@ -7,11 +7,21 @@
         <member name="T:UrlMatcher.Matcher">
             <summary>
             URL matcher.
+            Use the static methods to match a URL against a pattern once, or create an instance to parse a URL once and
+            match it against many patterns.  Instances are immutable after construction and are safe to use from
+            multiple threads concurrently.
             </summary>
+            <remarks>
+            URLs and patterns are split on '/' and empty segments are discarded, so leading, trailing, and repeated
+            slashes do not affect matching.  The query string and fragment are removed from the URL (not the pattern)
+            before matching.  Literal segments are compared ordinally (case-sensitive).  Parameter names are
+            case-insensitive.  Values are returned exactly as they appear in the URL and are not URL-decoded.
+            See <see cref="T:UrlMatcher.UrlPattern"/> for the full pattern syntax, including catch-all segments written {*name}.
+            </remarks>
         </member>
         <member name="P:UrlMatcher.Matcher.Url">
             <summary>
-            URL.
+            URL, with the query string and fragment removed.
             </summary>
         </member>
         <member name="P:UrlMatcher.Matcher.Parts">
@@ -25,12 +35,14 @@
             Instantiate the object.
             </summary>
             <param name="url">URL.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when url is null or empty.</exception>
         </member>
         <member name="M:UrlMatcher.Matcher.#ctor(System.Uri)">
             <summary>
             Instantiate the object.
             </summary>
-            <param name="uri">URI.</param>
+            <param name="uri">URI.  Only the path is used.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when uri is null.</exception>
         </member>
         <member name="M:UrlMatcher.Matcher.Match(System.String,System.Collections.Specialized.NameValueCollection@)">
             <summary>
@@ -38,10 +50,22 @@
             For example, match URI http://localhost:8000/v1.0/something/else/32 against pattern /{v}/something/else/{id}.
             Or, match URL /v1.0/something/else/32 against pattern /{v}/something/else/{id}.
             If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
+            A pattern ending in a catch-all, such as /api/{*rest}, matches zero or more remaining segments and captures the raw remainder.
             </summary>
-            <param name="pattern">The pattern used to evaluate the URI. Parameters are specified using {name} syntax.</param>
-            <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Will be empty if no match. URL-encoded values are matched as-is (not decoded).</param>
+            <param name="pattern">The pattern used to evaluate the URI. Parameters are specified using {name} syntax, and a final catch-all using {*name} syntax.</param>
+            <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match. URL-encoded values are matched as-is (not decoded).</param>
             <returns>True if matched. Note: Literal parts are case-sensitive while parameter names are case-insensitive.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when pattern is null or empty.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when the pattern has an invalid catch-all (not the entire segment, not the last segment, or more than one).</exception>
+        </member>
+        <member name="M:UrlMatcher.Matcher.Match(UrlMatcher.UrlPattern,System.Collections.Specialized.NameValueCollection@)">
+            <summary>
+            Match the URL or URI supplied in the constructor against a pre-parsed pattern.
+            </summary>
+            <param name="pattern">The parsed pattern.</param>
+            <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match. URL-encoded values are matched as-is (not decoded).</param>
+            <returns>True if matched.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when pattern is null.</exception>
         </member>
         <member name="M:UrlMatcher.Matcher.Match(System.Uri,System.String,System.Collections.Specialized.NameValueCollection@)">
             <summary>
@@ -49,21 +73,200 @@
             For example, match URI http://localhost:8000/v1.0/something/else/32 against pattern /{v}/something/else/{id}.
             If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
             </summary>
-            <param name="uri">The URI to evaluate.</param>
-            <param name="pattern">The pattern used to evaluate the URI. Parameters are specified using {name} syntax.</param>
-            <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Will be empty if no match.</param>
+            <param name="uri">The URI to evaluate.  Only the path is used.</param>
+            <param name="pattern">The pattern used to evaluate the URI. Parameters are specified using {name} syntax, and a final catch-all using {*name} syntax.</param>
+            <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match.</param>
             <returns>True if matched. Note: Literal parts are case-sensitive while parameter names are case-insensitive.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when uri is null, or pattern is null or empty.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when the pattern has an invalid catch-all (not the entire segment, not the last segment, or more than one).</exception>
+        </member>
+        <member name="M:UrlMatcher.Matcher.Match(System.Uri,UrlMatcher.UrlPattern,System.Collections.Specialized.NameValueCollection@)">
+            <summary>
+            Match a URI against a pre-parsed pattern.
+            </summary>
+            <param name="uri">The URI to evaluate.  Only the path is used.</param>
+            <param name="pattern">The parsed pattern.</param>
+            <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match.</param>
+            <returns>True if matched.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when uri or pattern is null.</exception>
         </member>
         <member name="M:UrlMatcher.Matcher.Match(System.String,System.String,System.Collections.Specialized.NameValueCollection@)">
             <summary>
             Match a URL against a pattern.
             For example, match URL /v1.0/something/else/32 against pattern /{v}/something/else/{id}.
             If a match exists, vals will contain keys name 'v' and 'id', and the associated values from the supplied URL.
+            A pattern ending in a catch-all, such as /api/{*rest}, matches zero or more remaining segments and captures the raw remainder.
             </summary>
             <param name="url">The URL to evaluate.</param>
-            <param name="pattern">The pattern used to evaluate the URL. Parameters are specified using {name} syntax.</param>
-            <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Will be empty if no match.</param>
+            <param name="pattern">The pattern used to evaluate the URL. Parameters are specified using {name} syntax, and a final catch-all using {*name} syntax.</param>
+            <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match.</param>
             <returns>True if matched. Note: Literal parts are case-sensitive while parameter names are case-insensitive.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when url or pattern is null or empty.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when the pattern has an invalid catch-all (not the entire segment, not the last segment, or more than one).</exception>
+        </member>
+        <member name="M:UrlMatcher.Matcher.Match(System.String,UrlMatcher.UrlPattern,System.Collections.Specialized.NameValueCollection@)">
+            <summary>
+            Match a URL against a pre-parsed pattern.
+            </summary>
+            <param name="url">The URL to evaluate.</param>
+            <param name="pattern">The parsed pattern.</param>
+            <param name="vals">Name value collection containing keys and values. Parameter names are case-insensitive. Never null, and empty if no match.</param>
+            <returns>True if matched.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when url is null or empty, or pattern is null.</exception>
+        </member>
+        <member name="T:UrlMatcher.SegmentTypeEnum">
+            <summary>
+            Type of a single pattern segment.
+            </summary>
+        </member>
+        <member name="F:UrlMatcher.SegmentTypeEnum.Literal">
+            <summary>
+            Literal segment.  Must match the corresponding URL segment exactly (ordinal, case-sensitive).
+            </summary>
+        </member>
+        <member name="F:UrlMatcher.SegmentTypeEnum.Parameter">
+            <summary>
+            Parameter segment, written {name}.  Captures exactly one URL segment.
+            </summary>
+        </member>
+        <member name="F:UrlMatcher.SegmentTypeEnum.CatchAll">
+            <summary>
+            Catch-all segment, written {*name}.  Must be the final segment of the pattern.
+            Captures zero or more remaining URL segments as the raw remainder of the URL.
+            </summary>
+        </member>
+        <member name="T:UrlMatcher.UrlPattern">
+            <summary>
+            A URL pattern parsed once and reusable across any number of matches.
+            Parse a pattern once at startup (for example, when a route is registered) and pass it to Matcher.Match
+            to avoid re-parsing the pattern on every request, and to surface invalid patterns immediately.
+            Instances are immutable after construction and are safe to use from multiple threads concurrently.
+            </summary>
+            <remarks>
+            Pattern syntax, evaluated per segment after splitting on '/' and discarding empty segments:
+            <list type="bullet">
+            <item><description>{name} captures exactly one URL segment as name.</description></item>
+            <item><description>{*name} is a catch-all.  It must be the entire final segment, matches zero or more remaining URL segments, and captures the raw remainder of the URL (empty string when nothing remains).</description></item>
+            <item><description>{}, {*}, an unclosed brace such as {id, and segments without braces such as * or ** are literals.</description></item>
+            <item><description>A segment containing a parameter group plus other text, such as v{version}, captures the whole URL segment as version.  Only the first brace group in a segment is considered.</description></item>
+            </list>
+            </remarks>
+        </member>
+        <member name="P:UrlMatcher.UrlPattern.Pattern">
+            <summary>
+            The original pattern text.  Never null or empty.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPattern.Segments">
+            <summary>
+            The parsed segments, in order.  Empty for a pattern with no segments, such as /.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPattern.SegmentCount">
+            <summary>
+            Total number of segments, including a catch-all segment if present.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPattern.FixedSegmentCount">
+            <summary>
+            Number of segments that must be matched one-to-one against URL segments, that is, every segment except a catch-all.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPattern.LiteralCount">
+            <summary>
+            Number of literal segments.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPattern.ParameterCount">
+            <summary>
+            Number of single-segment parameters, written {name}.  A catch-all is not counted.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPattern.LiteralPrefixCount">
+            <summary>
+            Number of consecutive literal segments at the start of the pattern.
+            Useful when ranking routes, since a longer literal prefix is usually more specific.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPattern.IsCatchAll">
+            <summary>
+            True if the final segment is a catch-all, written {*name}.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPattern.CatchAllName">
+            <summary>
+            The catch-all parameter name, without braces or the asterisk.  Null when the pattern has no catch-all.
+            </summary>
+        </member>
+        <member name="M:UrlMatcher.UrlPattern.#ctor(System.String)">
+            <summary>
+            Instantiate the object by parsing a pattern.
+            </summary>
+            <param name="pattern">The pattern, for example /{version}/users/{id} or /api/{*rest}.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when pattern is null or empty.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when a catch-all is not the entire segment, is not the last segment, or appears more than once.</exception>
+        </member>
+        <member name="M:UrlMatcher.UrlPattern.Parse(System.String)">
+            <summary>
+            Parse a pattern.
+            </summary>
+            <param name="pattern">The pattern, for example /{version}/users/{id} or /api/{*rest}.</param>
+            <returns>The parsed pattern.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when pattern is null or empty.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when a catch-all is not the entire segment, is not the last segment, or appears more than once.</exception>
+        </member>
+        <member name="M:UrlMatcher.UrlPattern.TryParse(System.String,UrlMatcher.UrlPattern@)">
+            <summary>
+            Attempt to parse a pattern without throwing.
+            </summary>
+            <param name="pattern">The pattern, for example /{version}/users/{id} or /api/{*rest}.</param>
+            <param name="result">The parsed pattern, or null when parsing fails.</param>
+            <returns>True if the pattern is valid.  False if the pattern is null, empty, or has an invalid catch-all.</returns>
+        </member>
+        <member name="M:UrlMatcher.UrlPattern.ToString">
+            <summary>
+            Return the original pattern text.
+            </summary>
+            <returns>Pattern text.</returns>
+        </member>
+        <member name="T:UrlMatcher.UrlPatternSegment">
+            <summary>
+            A single segment of a parsed URL pattern.
+            Instances are immutable and safe to share across threads.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPatternSegment.Text">
+            <summary>
+            The segment text exactly as it appeared in the pattern, for example users, {id}, or {*rest}.
+            Never null or empty.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPatternSegment.Type">
+            <summary>
+            The segment type.
+            </summary>
+        </member>
+        <member name="P:UrlMatcher.UrlPatternSegment.Name">
+            <summary>
+            The parameter name for parameter and catch-all segments, without braces or the leading asterisk.
+            Null for literal segments.
+            </summary>
+        </member>
+        <member name="M:UrlMatcher.UrlPatternSegment.#ctor(System.String,UrlMatcher.SegmentTypeEnum,System.String)">
+            <summary>
+            Instantiate the object.
+            </summary>
+            <param name="text">Segment text as it appeared in the pattern.</param>
+            <param name="type">Segment type.</param>
+            <param name="name">Parameter name.  Required for parameter and catch-all segments, must be null for literal segments.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when text is null or empty, or when name is null or empty for a parameter or catch-all segment.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when a name is supplied for a literal segment.</exception>
+        </member>
+        <member name="M:UrlMatcher.UrlPatternSegment.ToString">
+            <summary>
+            Return the segment text.
+            </summary>
+            <returns>Segment text.</returns>
         </member>
     </members>
 </doc>

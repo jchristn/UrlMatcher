@@ -4,85 +4,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-UrlMatcher is a .NET library published to NuGet that provides URL pattern matching with parameter extraction. The library supports both static and instance methods for matching URLs/URIs against patterns like `/{version}/users/{userId}`.
+UrlMatcher is a .NET library published to NuGet that provides URL pattern matching with parameter extraction and catch-all segments, for patterns like `/{version}/users/{userId}` and `/api/{*rest}`.  Watson Webserver (`ParameterRouteManager`, `WebSocketRouteManager`) and Switchboard depend on it, so behavior changes must be checked against those callers.
 
-## Build Commands
+## Build and Test
 
-Build the entire solution:
 ```bash
 dotnet build src/UrlMatcher.sln
-```
-
-Build specific projects:
-```bash
-dotnet build src/UrlMatcher/UrlMatcher.csproj
-dotnet build src/Test/Test.csproj
-```
-
-Build for specific frameworks:
-```bash
-dotnet build src/UrlMatcher/UrlMatcher.csproj -f net8.0
-dotnet build src/UrlMatcher/UrlMatcher.csproj -f netstandard2.1
-```
-
-Create NuGet package (happens automatically on build):
-```bash
-dotnet build src/UrlMatcher/UrlMatcher.csproj -c Release
-```
-
-Run the test application:
-```bash
-dotnet run --project src/Test/Test.csproj
+dotnet run --project src/Test.Automated -- --results results.json
+dotnet test src/Test.Xunit
+dotnet test src/Test.Nunit
+dotnet build src/UrlMatcher/UrlMatcher.csproj -c Release   # produces .nupkg and .snupkg (GeneratePackageOnBuild)
 ```
 
 ## Architecture
 
-### Core Library (`src/UrlMatcher/`)
+### Library (`src/UrlMatcher/`)
 
-The library consists of a single class `Matcher` in `Matcher.cs` with two usage patterns:
+- `Matcher.cs`: static and instance `Match` overloads for `string` and `Uri` URLs against `string` or `UrlPattern` patterns.  An instance splits its URL once and records each segment's start offset so a catch-all can return the raw remainder with one `Substring`.
+- `UrlPattern.cs`: parses a pattern once (`new UrlPattern`, `Parse`, `TryParse`), validates catch-all placement, and exposes shape properties for route ranking.
+- `UrlPatternSegment.cs` and `SegmentTypeEnum.cs`: one parsed segment (`Literal`, `Parameter`, `CatchAll`).
 
-1. **Static methods** (`Matcher.Match()`): Use for one-time URL matching against a pattern
-2. **Instance methods** (`new Matcher(url).Match(pattern)`): Use when matching the same URL against multiple patterns to avoid re-parsing
+Matching rules: split on `/` discarding empty segments; strip `?` and `#` from the URL only; literal segments compare ordinally; parameter names are case-insensitive (`StringComparer.InvariantCultureIgnoreCase`); a failed match returns an empty collection; a catch-all `{*name}` must be the entire last segment and matches zero or more segments.  `{}`, `{*}`, `*`, `**`, and unclosed braces are literals.  The whole-segment capture for `v{x}` and first-group-only rule for `{a}{b}` are retained quirks.
 
-### Pattern Matching Logic
+### Tests (Touchstone)
 
-- URLs are split by `/` into parts (query strings and fragments removed via `Split('?', '#')`)
-- Patterns use curly braces for parameters: `/{version}/users/{userId}`
-- Parts are matched positionally - URL and pattern must have same number of parts
-- Pattern parts without `{}` must match exactly (case-sensitive)
-- Pattern parts with `{}` extract the URL value into a `NameValueCollection` (case-insensitive keys)
-- Key methods:
-  - `MatchInternal()` (line 140): Core matching algorithm comparing URL parts to pattern parts
-  - `ExtractParameter()` (line 170): Extracts parameter name from `{param}` syntax
+- `src/Test.Shared`: all descriptors (Touchstone.Core only, no console output).  `UrlMatcherSuites.All` aggregates one static class per suite in `Suites/`.  `MatchVerifier` runs each match case through all four string entry points (or all four `Uri` entry points), so every case also proves overload equivalence.  `CaseFactory` builds `Match`, `NoMatch`, and `Throws` descriptors.
+- `src/Test.Automated`: `ConsoleRunner`, supports `--results <path>`.
+- `src/Test.Xunit`, `src/Test.Nunit`: fact-style and per-case adapters.  xUnit files need `using global::Xunit;` because of the `Test.Xunit` namespace.
+- Test projects target `net8.0;net10.0` only (Touchstone has no .NET Framework build).  CI builds the library for every target framework in Release.
 
 ### Multi-Targeting
 
-The library targets multiple frameworks defined in `UrlMatcher.csproj`:
-- .NET Standard 2.0, 2.1 (broad compatibility)
-- .NET Framework 4.6.2, 4.8 (legacy support)
-- .NET 8.0, 10.0 (modern .NET)
+The library targets `netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0`.  Keep library code to C# 7.3 features and APIs available on `netstandard2.0`.  Nullable reference types are not enabled in the library.
 
-The Test and AutomatedTest projects target: `net462`, `net48`, `net8.0`, `net10.0`
+## Code Style (from CODE_STYLE.md)
 
-### NuGet Package
-
-- Package generation is automatic on build (`GeneratePackageOnBuild`)
-- Version is specified in `UrlMatcher.csproj` (currently 3.0.1)
-- XML documentation is generated automatically (`GenerateDocumentationFile`)
-- Strong naming is used (previous commit history)
-
-### Test Application
-
-`src/Test/Program.cs` provides an interactive console app that:
-- Prompts for pattern and URL inputs (using Inputty library)
-- Tests both static and instance methods
-- Displays extracted parameter values
-- Runs in an infinite loop for repeated testing
-
-## Code Conventions
-
-- Namespace matches project name: `UrlMatcher`, `Test`
-- Region organization: `#region Public-Members`, `#region Private-Members`, `#region Constructors-and-Factories`, `#region Public-Methods`, `#region Private-Methods`
-- Private fields prefixed with underscore: `_Url`, `_Parts`
-- XML documentation comments required (enforced by build)
-- `StringComparer.InvariantCultureIgnoreCase` used for parameter name matching
+- Namespace first; `using` statements inside the namespace, System usings first, then others, each alphabetical
+- XML documentation on all public members, including `<exception>` tags and thread-safety notes; none on private members
+- Private fields are `_PascalCase`; no `var`; no tuples; one class or enum per file
+- Specific exception types with messages that include the offending input
+- Regions (`Public-Members`, `Private-Members`, `Constructors-and-Factories`, `Public-Methods`, `Private-Methods`) in library classes
+- No `Console.Write*` in library or Test.Shared code
+- Never use em-dashes in code, comments, or docs
+- Do not change the version number unless the user explicitly asks (VERSIONING.md)

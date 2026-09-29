@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
-		<Version>3.0.2</Version>
+		<Version>3.1.0</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Authors>Joel Christner</Authors>
 		<Description>Simple URL matcher library allowing you to match based on explicit string or parameters</Description>
@@ -12,8 +12,8 @@
 		<PackageIcon>icon.png</PackageIcon>
 		<RepositoryUrl>https://github.com/jchristn/UrlMatcher</RepositoryUrl>
 		<RepositoryType>github</RepositoryType>
-		<PackageTags>url match matcher parameter</PackageTags>
-		<PackageReleaseNotes>Performance optimizations, security fix for Parts property immutability, improved documentation.</PackageReleaseNotes>
+		<PackageTags>url match matcher parameter route routing catch-all wildcard</PackageTags>
+		<PackageReleaseNotes>Catch-all segments ({*name}), UrlPattern for pre-parsed patterns, failed matches always return an empty collection.</PackageReleaseNotes>
 		<ApplicationIcon>assets\icon.ico</ApplicationIcon>
 		<Title>UrlMatcher</Title>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
