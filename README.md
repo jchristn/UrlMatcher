@@ -10,11 +10,13 @@ Simple URL matcher library allowing you to match based on explicit strings, para
 
 First things first - do you need help or have feedback?  File an issue here!  We'd love to hear from you.
 
-## New in v3.1.0
+## New in v3.1.x
 
-- Catch-all segments: `/api/{*rest}` matches `/api`, `/api/users`, and `/api/users/42/orders`
-- `UrlPattern` parses a pattern once for reuse, reports its shape for route ranking, and rejects invalid patterns up front
-- A failed match always returns an empty collection (3.0.2 could leave values captured before the failing segment)
+- v3.1.1: maintenance release with updated test dependencies (Touchstone 0.2.0, NUnit 5, xUnit runner 4); no behavior changes
+- v3.1.0:
+  - Catch-all segments: `/api/{*rest}` matches `/api`, `/api/users`, and `/api/users/42/orders`
+  - `UrlPattern` parses a pattern once for reuse, reports its shape for route ranking, and rejects invalid patterns up front
+  - A failed match always returns an empty collection (3.0.2 could leave values captured before the failing segment)
 
 See [CHANGELOG.md](CHANGELOG.md) for compatibility notes.
 

@@ -2,6 +2,14 @@
 
 ## Current Version
 
+v3.1.1
+
+- Maintenance release.  No library code or behavior changes, and the library still has no package dependencies
+- Test dependencies updated: Touchstone 0.1.12 -> 0.2.0, Microsoft.NET.Test.Sdk 17.14.1 -> 18.10.1, coverlet.collector 6.0.4 -> 10.1.0, xunit.runner.visualstudio 3.1.4 -> 4.0.0, NUnit 4.3.2 -> 5.0.0, NUnit.Analyzers 4.7.0 -> 4.15.0, NUnit3TestAdapter 5.0.0 -> 6.3.0
+- All 358 Touchstone cases pass on .NET 8.0 and 10.0 through the console, xUnit, and NUnit runners
+
+## Previous Versions
+
 v3.1.0
 
 - Catch-all segments: `{*name}` as the entire final segment matches zero or more remaining URL segments and captures the raw remainder of the URL (repeated and trailing slashes kept, not decoded, query and fragment removed)
@@ -19,8 +27,6 @@ These behavior changes only affect patterns that use an asterisk inside braces:
 - `{*name}` was an ordinary single-segment parameter named `*name`.  It is now a catch-all named `name`
 - `{*name}` in any position other than the entire last segment, or more than one catch-all, now throws `ArgumentException` (from `Match` and from `UrlPattern`).  Routers should parse patterns with `UrlPattern.Parse` when routes are registered so the error surfaces once
 - `{*}` was a parameter named `*`.  It is now a literal, consistent with `{}`
-
-## Previous Versions
 
 v3.0.2
 

@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
-		<Version>3.1.0</Version>
+		<Version>3.1.1</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Authors>Joel Christner</Authors>
 		<Description>Simple URL matcher library allowing you to match based on explicit string or parameters</Description>
@@ -13,7 +13,7 @@
 		<RepositoryUrl>https://github.com/jchristn/UrlMatcher</RepositoryUrl>
 		<RepositoryType>github</RepositoryType>
 		<PackageTags>url match matcher parameter route routing catch-all wildcard</PackageTags>
-		<PackageReleaseNotes>Catch-all segments ({*name}), UrlPattern for pre-parsed patterns, failed matches always return an empty collection.</PackageReleaseNotes>
+		<PackageReleaseNotes>Maintenance release: test dependency updates, no library behavior changes.  Includes catch-all segments ({*name}) and UrlPattern from 3.1.0.</PackageReleaseNotes>
 		<ApplicationIcon>assets\icon.ico</ApplicationIcon>
 		<Title>UrlMatcher</Title>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
